@@ -1,12 +1,23 @@
+package main
 
+import (
+	"database/sql"
+	"fmt"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+)
 
 func defineEntryPoints() {
 	router := gin.Default()
 	//MaruBoard APIs
+	//BBS boards
+	router.POST("/maru/bbs", bbs.CreateMaruBoard)
+
 	//BBS posts
-	router.GET("/maru/bbs/:bid/post/:id", getObjectById)
-	router.POST("/maru/bbs/:bid/post/", dms.PostUploadDocumnt)
+	// router.GET("/maru/bbs/:bid/post/:id", getObjectById)
+	// router.POST("/maru/bbs/:bid/post/", dms.PostUploadDocumnt)
 	// //multiple file operation
 	// router.GET("/api/dms/objects", getObjectList)
 	// router.POST("/api/dms/objects", dms.PostUploadDocumnts)
@@ -21,6 +32,12 @@ func defineEntryPoints() {
 	// router.GET("/api/admin/tenant/:id", admin.GetTenantById)
 
 	router.Run("localhost:9132")
+}
+
+func CheckError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 var db *gorm.DB
