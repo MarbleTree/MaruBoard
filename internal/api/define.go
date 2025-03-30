@@ -8,9 +8,9 @@ var CurrentFolder string
 var STR_DB_CONNECT string
 
 const (
-	Host     = "127.0.0.1"
+	Host     = "localhost"
 	Port     = 5432
 	User     = "postgres"
-	Password = "Admin!23"
+	Password = "Admin#1234"
 	Dbname   = "MaruBoard"
 )

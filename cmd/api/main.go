@@ -3,8 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
 
+	def "github.com/MarbleTree/MaruBoard/internal/api"
+	"github.com/MarbleTree/MaruBoard/internal/bbs"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
@@ -95,15 +96,6 @@ func main() {
 }
 
 func getObjectById(c *gin.Context) {
-	id := c.Param("id")
+	// id := c.Param("id")
 
-	// Loop through the list of albums, looking for
-	// an album whose ID value matches the parameter.
-	for _, a := range albums {
-		if a.ID == id {
-			c.IndentedJSON(http.StatusOK, a)
-			return
-		}
-	}
-	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
