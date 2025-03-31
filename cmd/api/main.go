@@ -4,10 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
+	_ "github.com/lib/pq"
+
 	def "github.com/MarbleTree/MaruBoard/internal/api"
 	"github.com/MarbleTree/MaruBoard/internal/bbs"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 func defineEntryPoints() {
@@ -41,9 +42,6 @@ func CheckError(err error) {
 	}
 }
 
-var db *gorm.DB
-var err error
-
 func initializeDatabase() {
 
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", def.Host, def.Port, def.User, def.Password, def.Dbname)
@@ -55,10 +53,26 @@ func initializeDatabase() {
 	// close database
 	defer db.Close()
 
-	createtable := `CREATE TABLE dms_tenants(id varchar(64) NOT NULL, description varchar(255) NOT NULL, email varchar(255) NOT NULL, PRIMARY KEY (id));`
-	_, e := db.Exec(createtable)
-	fmt.Printf("Error = [%s]", e)
-	//CheckError(e)
+	//see if table is already exist
+	dbstmt := `SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename  = 'maru_boards');`
+	rows, e := db.Query(dbstmt)
+	CheckError(e)
+
+	// Foreach movie
+	var exist string
+	rows.Next()
+	err = rows.Scan(&exist)
+	// check errors
+	CheckError(err)
+	//table is not exist, let's initialize it
+	if exist == "false" {
+		dbstmt := `CREATE TABLE maru_boards(bid uuid NOT NULL, name varchar(255) NOT NULL, owner varchar(255) NOT NULL, options json NOT NULL, PRIMARY KEY (bid));`
+		_, e := db.Exec(dbstmt)
+		CheckError(e)
+		dbstmt = `CREATE TABLE maru_contents(cid varchar(64) NOT NULL, uid varchar(64) NOT NULL, bid uuid NOT NULL, uid_name varchar(64) NOT NULL, title varchar(255) NOT NULL, view integer NOT NULL, content text NOT NULL, PRIMARY KEY (cid));`
+		_, e = db.Exec(dbstmt)
+		CheckError(e)
+	}
 
 	// insertStmt := `CREATE TABLE dms_root(id varchar(64) NOT NULL, description varchar(255) NOT NULL, email varchar(255) NOT NULL, PRIMARY KEY (id));`
 	// _, e = db.Exec(insertStmt)
